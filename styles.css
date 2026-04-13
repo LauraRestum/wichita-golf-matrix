@@ -207,6 +207,33 @@ body {
   font-size: 1.08rem;
 }
 
+.modal-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  margin-bottom: 0.45rem;
+}
+
+.modal-arrow {
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--brand-blue);
+  font-size: 1.2rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.45rem;
+  cursor: pointer;
+}
+
+.modal-arrow:hover:not(:disabled) {
+  background: #eaf3ff;
+}
+
+.modal-arrow:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .modal-preview {
   min-height: 60vh;
   border: 1px solid var(--border);

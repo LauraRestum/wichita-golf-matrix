@@ -134,6 +134,11 @@ const modal = document.getElementById("asset-modal");
 const modalTitle = document.getElementById("modal-title");
 const modalPreview = document.getElementById("modal-preview");
 const modalClose = document.getElementById("modal-close");
+const modalPrev = document.getElementById("modal-prev");
+const modalNext = document.getElementById("modal-next");
+
+const allAssets = sectionConfig.flatMap((group) => group.sections.flatMap((section) => section.assets));
+let activeAssetIndex = -1;
 
 const createPlaceholder = (label = "Image not uploaded yet") => {
   const holder = document.createElement("div");
@@ -242,7 +247,7 @@ const buildNav = () => {
   });
 };
 
-const openModal = (asset) => {
+const renderModalAsset = (asset) => {
   modalTitle.textContent = asset.name;
   modalPreview.replaceChildren();
 
@@ -257,14 +262,44 @@ const openModal = (asset) => {
   fullImage.addEventListener("load", () => {
     modalPreview.append(fullImage);
   });
+};
+
+const updateModalNavigation = () => {
+  const atStart = activeAssetIndex <= 0;
+  const atEnd = activeAssetIndex >= allAssets.length - 1;
+  modalPrev.disabled = atStart;
+  modalNext.disabled = atEnd;
+};
+
+const openModalByIndex = (index) => {
+  activeAssetIndex = index;
+  renderModalAsset(allAssets[activeAssetIndex]);
+  updateModalNavigation();
 
   modal.hidden = false;
   document.body.style.overflow = "hidden";
 };
 
+const openModal = (asset) => {
+  const nextIndex = allAssets.findIndex((item) => item.file === asset.file);
+  if (nextIndex === -1) {
+    return;
+  }
+  openModalByIndex(nextIndex);
+};
+
+const stepModalAsset = (step) => {
+  const nextIndex = activeAssetIndex + step;
+  if (nextIndex < 0 || nextIndex >= allAssets.length) {
+    return;
+  }
+  openModalByIndex(nextIndex);
+};
+
 const closeModal = () => {
   modal.hidden = true;
   document.body.style.overflow = "";
+  activeAssetIndex = -1;
 };
 
 const setupActiveNavigation = () => {
@@ -287,6 +322,8 @@ const setupActiveNavigation = () => {
 };
 
 modalClose.addEventListener("click", closeModal);
+modalPrev.addEventListener("click", () => stepModalAsset(-1));
+modalNext.addEventListener("click", () => stepModalAsset(1));
 modal.addEventListener("click", (event) => {
   if (event.target === modal) {
     closeModal();
@@ -294,8 +331,21 @@ modal.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !modal.hidden) {
+  if (modal.hidden) {
+    return;
+  }
+
+  if (event.key === "Escape") {
     closeModal();
+    return;
+  }
+
+  if (event.key === "ArrowLeft") {
+    stepModalAsset(-1);
+  }
+
+  if (event.key === "ArrowRight") {
+    stepModalAsset(1);
   }
 });
 
