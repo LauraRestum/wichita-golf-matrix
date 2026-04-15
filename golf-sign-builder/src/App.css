@@ -1,0 +1,50 @@
+.app {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #1B365D;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background-color: #1B365D;
+  color: #ffffff;
+  padding: 1.25rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.component-section {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.component-section h2 {
+  margin: 0 0 0.5rem 0;
+  color: #1B365D;
+  font-size: 1.25rem;
+}
+
+.component-section p {
+  margin: 0;
+  color: #555;
+}
