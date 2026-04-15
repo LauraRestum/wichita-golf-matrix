@@ -146,11 +146,6 @@ body {
   outline-color: var(--brand-blue);
 }
 
-.tile-preview.drag-over {
-  background: #eaf3ff;
-  outline-color: var(--brand-blue);
-}
-
 .tile-preview img {
   max-width: 100%;
   max-height: 100%;
@@ -187,102 +182,6 @@ body {
   margin-top: 0.35rem;
   font-size: 0.75rem;
   color: var(--text-muted);
-}
-
-.tile-status {
-  margin: 0.45rem 0 0;
-  font-size: 0.72rem;
-  color: var(--brand-green);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.tile-actions {
-  display: flex;
-  gap: 0.4rem;
-  margin-top: 0.55rem;
-}
-
-.tile-btn {
-  border: 1px solid var(--brand-blue);
-  background: var(--brand-blue);
-  color: var(--white);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.35rem 0.7rem;
-  border-radius: 0.4rem;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.tile-btn:hover {
-  background: #033a77;
-  border-color: #033a77;
-}
-
-.tile-btn-remove {
-  background: var(--white);
-  color: var(--brand-blue);
-}
-
-.tile-btn-remove:hover {
-  background: #eaf3ff;
-}
-
-.upload-bar {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.85rem 1rem;
-  margin-bottom: 1.25rem;
-  border: 1px dashed #bbcadf;
-  border-radius: 0.7rem;
-  background: var(--surface);
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.upload-bar.drag-over {
-  background: #eaf3ff;
-  border-color: var(--brand-blue);
-}
-
-.upload-bar-info {
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  line-height: 1.4;
-}
-
-.upload-bar-info strong {
-  color: var(--brand-blue);
-}
-
-.upload-bar-controls {
-  flex-shrink: 0;
-}
-
-.upload-badge {
-  margin-top: 1.25rem;
-  padding: 0.65rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.upload-badge p {
-  margin: 0;
-  font-size: 0.78rem;
-  color: var(--text-primary);
-}
-
-.upload-badge .tile-btn {
-  padding: 0.25rem 0.55rem;
-  font-size: 0.72rem;
 }
 
 .modal {

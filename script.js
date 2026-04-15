@@ -134,7 +134,8 @@ const sectionConfig = [
   },
 ];
 
-const assetRoot = "data/signs/";
+// Images are committed to the repo root, so asset filenames resolve directly.
+const assetRoot = "";
 const navRoot = document.getElementById("sidebar-nav");
 const contentRoot = document.getElementById("content");
 const modal = document.getElementById("asset-modal");
@@ -145,175 +146,7 @@ const modalPrev = document.getElementById("modal-prev");
 const modalNext = document.getElementById("modal-next");
 
 const allAssets = sectionConfig.flatMap((group) => group.sections.flatMap((section) => section.assets));
-const assetByFile = new Map(allAssets.map((asset) => [asset.file, asset]));
 let activeAssetIndex = -1;
-
-// ---------------------------------------------------------------------------
-// Fuzzy filename matcher. Users rarely get the exact filename right when
-// dropping art — tokens differ by separator, casing, or extra descriptors
-// ("aloft-hotel" vs "aloft", "Capital Federal" vs "capitalfederal"). We fall
-// back to token overlap, preferring the asset with the clearest lead.
-// ---------------------------------------------------------------------------
-const stripExt = (name) => name.toLowerCase().replace(/\.[^.]+$/, "");
-const squishFilename = (name) => stripExt(name).replace(/[^a-z0-9]/g, "");
-const tokenizeFilename = (name) =>
-  stripExt(name)
-    .split(/[^a-z0-9]+/)
-    .filter(Boolean);
-
-const FUZZY_THRESHOLD = 0.75;
-
-const findAssetByFilename = (filename) => {
-  // 1. Exact filename match (fast path).
-  if (assetByFile.has(filename)) return assetByFile.get(filename);
-
-  // 2. Alphanumeric-only match handles separator / casing differences, e.g.
-  //    `30x30_all-sponsor.jpg` vs `30x30_allsponsor.jpg`, or
-  //    `24x18_Teebox_Aloft.JPG` vs `24x18_teebox_aloft.jpg`.
-  const upSquish = squishFilename(filename);
-  if (upSquish) {
-    for (const asset of allAssets) {
-      if (squishFilename(asset.file) === upSquish) return asset;
-    }
-    // 2b. Unambiguous substring match — catches `capital federal.jpg` →
-    //     `24x18_teebox_capitalfederal.jpg` when the user drops a bare
-    //     sponsor name. Requires >=4 chars and exactly one hit so generic
-    //     prefixes like `24x18` or `teebox` don't resolve arbitrarily.
-    if (upSquish.length >= 4) {
-      const hits = allAssets.filter((a) => {
-        const s = squishFilename(a.file);
-        return s.includes(upSquish) || upSquish.includes(s);
-      });
-      if (hits.length === 1) return hits[0];
-    }
-  }
-
-  // 3. Token overlap handles missing/extra descriptors, e.g.
-  //    `aloft-hotel.jpg` → `24x18_teebox_aloft.jpg`.
-  const uploaded = tokenizeFilename(filename);
-  if (!uploaded.length) return null;
-  const uploadedSet = new Set(uploaded);
-
-  let best = null;
-  let bestScore = 0;
-  let tied = false;
-
-  for (const asset of allAssets) {
-    const target = tokenizeFilename(asset.file);
-    if (!target.length) continue;
-    let shared = 0;
-    for (const token of target) if (uploadedSet.has(token)) shared += 1;
-    // Score by coverage of the smaller side — rewards partial names like
-    // `aloft.jpg` matching `24x18_teebox_aloft.jpg` without inflating when
-    // two assets happen to share generic tokens (24, 18, pin, flag, ...).
-    const score = shared / Math.min(uploaded.length, target.length);
-    if (score > bestScore) {
-      best = asset;
-      bestScore = score;
-      tied = false;
-    } else if (score === bestScore && score > 0 && asset !== best) {
-      tied = true;
-    }
-  }
-
-  if (!best || bestScore < FUZZY_THRESHOLD || tied) return null;
-  return best;
-};
-
-// ---------------------------------------------------------------------------
-// Local-only uploads (IndexedDB). Lets you preview sign art in the matrix
-// without committing anything to the repo — no pushes, no builds.
-// ---------------------------------------------------------------------------
-const DB_NAME = "wgm-sign-uploads";
-const STORE = "files";
-let dbPromise;
-
-const openDb = () => {
-  if (!dbPromise) {
-    dbPromise = new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = () => req.result.createObjectStore(STORE);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
-  return dbPromise;
-};
-
-const idbGet = async (key) => {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const req = db.transaction(STORE, "readonly").objectStore(STORE).get(key);
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror = () => reject(req.error);
-  });
-};
-
-const idbPut = async (key, value) => {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put(value, key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-};
-
-const idbDelete = async (key) => {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).delete(key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-};
-
-const idbAllKeys = async () => {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const req = db.transaction(STORE, "readonly").objectStore(STORE).getAllKeys();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
-  });
-};
-
-// In-memory cache of file -> object URL (reused for tile + modal previews)
-const uploadUrls = new Map();
-// file -> tile refresh callback, so bulk/clear actions can re-render tiles
-const tileHandlers = new Map();
-
-const revokeUrl = (file) => {
-  const prev = uploadUrls.get(file);
-  if (prev) {
-    URL.revokeObjectURL(prev);
-    uploadUrls.delete(file);
-  }
-};
-
-const loadUpload = async (file) => {
-  if (uploadUrls.has(file)) return uploadUrls.get(file);
-  const blob = await idbGet(file);
-  if (!blob) return null;
-  const url = URL.createObjectURL(blob);
-  uploadUrls.set(file, url);
-  return url;
-};
-
-const storeUpload = async (file, blob) => {
-  await idbPut(file, blob);
-  revokeUrl(file);
-  const url = URL.createObjectURL(blob);
-  uploadUrls.set(file, url);
-  updateUploadBadge();
-  return url;
-};
-
-const removeUpload = async (file) => {
-  await idbDelete(file);
-  revokeUrl(file);
-  updateUploadBadge();
-};
 
 // ---------------------------------------------------------------------------
 // Tiles
@@ -325,25 +158,21 @@ const createPlaceholder = (label = "Image not uploaded yet") => {
   return holder;
 };
 
-const renderTilePreview = (preview, asset, localUrl) => {
-  preview.replaceChildren(
-    createPlaceholder(localUrl ? "Loading local upload..." : "Checking /data/signs/ for image...")
-  );
+const renderTilePreview = (preview, asset) => {
+  preview.replaceChildren(createPlaceholder("Loading..."));
 
   const image = new Image();
   image.loading = "lazy";
   image.alt = asset.name;
 
   image.addEventListener("error", () => {
-    image.remove();
     preview.replaceChildren(createPlaceholder());
   });
-
   image.addEventListener("load", () => {
     preview.replaceChildren(image);
   });
 
-  image.src = localUrl || `${assetRoot}${asset.file}`;
+  image.src = `${assetRoot}${asset.file}`;
 };
 
 const buildAssetTile = (asset) => {
@@ -373,103 +202,12 @@ const buildAssetTile = (asset) => {
 
   const fileLabel = document.createElement("p");
   fileLabel.className = "tile-file";
-  fileLabel.textContent = `Expected file: ${assetRoot}${asset.file}`;
+  fileLabel.textContent = asset.file;
 
-  const status = document.createElement("p");
-  status.className = "tile-status";
-  status.textContent = "Stored locally in your browser";
-  status.hidden = true;
-
-  const actions = document.createElement("div");
-  actions.className = "tile-actions";
-
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.hidden = true;
-
-  const uploadBtn = document.createElement("button");
-  uploadBtn.type = "button";
-  uploadBtn.className = "tile-btn";
-  uploadBtn.textContent = "Upload";
-
-  const removeBtn = document.createElement("button");
-  removeBtn.type = "button";
-  removeBtn.className = "tile-btn tile-btn-remove";
-  removeBtn.textContent = "Remove";
-  removeBtn.hidden = true;
-
-  const applyLocalState = (hasLocal) => {
-    uploadBtn.textContent = hasLocal ? "Replace" : "Upload";
-    removeBtn.hidden = !hasLocal;
-    status.hidden = !hasLocal;
-  };
-
-  const refreshFromStore = async () => {
-    const url = await loadUpload(asset.file);
-    applyLocalState(Boolean(url));
-    renderTilePreview(preview, asset, url);
-  };
-
-  const handleFile = async (file) => {
-    if (!file || !file.type.startsWith("image/")) {
-      alert("Please pick an image file.");
-      return;
-    }
-    try {
-      const url = await storeUpload(asset.file, file);
-      applyLocalState(true);
-      renderTilePreview(preview, asset, url);
-      const idx = allAssets.findIndex((a) => a.file === asset.file);
-      if (idx === activeAssetIndex && !modal.hidden) {
-        renderModalAsset(asset);
-      }
-    } catch (err) {
-      console.error("Upload failed", err);
-      alert("Sorry, that file couldn't be stored locally.");
-    }
-  };
-
-  uploadBtn.addEventListener("click", () => input.click());
-
-  input.addEventListener("change", async () => {
-    const chosen = input.files?.[0];
-    input.value = "";
-    if (chosen) await handleFile(chosen);
-  });
-
-  removeBtn.addEventListener("click", async () => {
-    await removeUpload(asset.file);
-    applyLocalState(false);
-    renderTilePreview(preview, asset, null);
-    const idx = allAssets.findIndex((a) => a.file === asset.file);
-    if (idx === activeAssetIndex && !modal.hidden) {
-      renderModalAsset(asset);
-    }
-  });
-
-  // Drag-and-drop directly on the preview
-  preview.addEventListener("dragover", (event) => {
-    if (event.dataTransfer?.types?.includes("Files")) {
-      event.preventDefault();
-      preview.classList.add("drag-over");
-    }
-  });
-  preview.addEventListener("dragleave", () => preview.classList.remove("drag-over"));
-  preview.addEventListener("drop", async (event) => {
-    event.preventDefault();
-    preview.classList.remove("drag-over");
-    const dropped = event.dataTransfer?.files?.[0];
-    if (dropped) await handleFile(dropped);
-  });
-
-  actions.append(input, uploadBtn, removeBtn);
-  body.append(title, fileLabel, status, actions);
+  body.append(title, fileLabel);
   card.append(preview, body);
 
-  tileHandlers.set(asset.file, { refresh: refreshFromStore });
-  refreshFromStore();
-
+  renderTilePreview(preview, asset);
   return card;
 };
 
@@ -531,158 +269,28 @@ const buildNav = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Bulk upload bar (match dropped files by filename)
-// ---------------------------------------------------------------------------
-const buildUploadBar = () => {
-  const bar = document.createElement("div");
-  bar.className = "upload-bar";
-
-  const info = document.createElement("div");
-  info.className = "upload-bar-info";
-  info.innerHTML =
-    "<strong>Upload signs without committing.</strong> Drop files here (matched by filename) " +
-    "or use the Upload button on any tile. Images are stored in this browser only — no builds triggered.";
-
-  const controls = document.createElement("div");
-  controls.className = "upload-bar-controls";
-
-  const bulkInput = document.createElement("input");
-  bulkInput.type = "file";
-  bulkInput.accept = "image/*";
-  bulkInput.multiple = true;
-  bulkInput.hidden = true;
-
-  const pickBtn = document.createElement("button");
-  pickBtn.type = "button";
-  pickBtn.className = "tile-btn";
-  pickBtn.textContent = "Pick files…";
-  pickBtn.addEventListener("click", () => bulkInput.click());
-
-  bulkInput.addEventListener("change", async () => {
-    await handleBulkFiles([...bulkInput.files]);
-    bulkInput.value = "";
-  });
-
-  controls.append(bulkInput, pickBtn);
-  bar.append(info, controls);
-
-  bar.addEventListener("dragover", (event) => {
-    if (event.dataTransfer?.types?.includes("Files")) {
-      event.preventDefault();
-      bar.classList.add("drag-over");
-    }
-  });
-  bar.addEventListener("dragleave", () => bar.classList.remove("drag-over"));
-  bar.addEventListener("drop", async (event) => {
-    event.preventDefault();
-    bar.classList.remove("drag-over");
-    await handleBulkFiles([...(event.dataTransfer?.files || [])]);
-  });
-
-  return bar;
-};
-
-const handleBulkFiles = async (files) => {
-  const exact = [];
-  const fuzzy = [];
-  const unmatched = [];
-  for (const file of files) {
-    if (!file.type.startsWith("image/")) continue;
-    const asset = findAssetByFilename(file.name);
-    if (!asset) {
-      unmatched.push(file.name);
-      continue;
-    }
-    await storeUpload(asset.file, file);
-    tileHandlers.get(asset.file)?.refresh();
-    if (file.name === asset.file) {
-      exact.push(file.name);
-    } else {
-      fuzzy.push(`${file.name} → ${asset.file}`);
-    }
-  }
-
-  if (exact.length || fuzzy.length || unmatched.length) {
-    const parts = [];
-    const matchedCount = exact.length + fuzzy.length;
-    if (matchedCount) parts.push(`${matchedCount} matched and stored.`);
-    if (fuzzy.length) {
-      parts.push(`Fuzzy-matched (close filename):\n - ${fuzzy.join("\n - ")}`);
-    }
-    if (unmatched.length) {
-      parts.push(
-        `${unmatched.length} didn't match any expected filename:\n - ${unmatched.join("\n - ")}`
-      );
-    }
-    alert(parts.join("\n\n"));
-  }
-};
-
-// ---------------------------------------------------------------------------
-// Sidebar badge: show count + clear-all
-// ---------------------------------------------------------------------------
-const uploadBadge = document.createElement("div");
-uploadBadge.className = "upload-badge";
-uploadBadge.hidden = true;
-
-const updateUploadBadge = async () => {
-  const keys = await idbAllKeys();
-  if (!keys.length) {
-    uploadBadge.hidden = true;
-    uploadBadge.replaceChildren();
-    return;
-  }
-  uploadBadge.hidden = false;
-  uploadBadge.replaceChildren();
-
-  const line = document.createElement("p");
-  line.textContent = `${keys.length} sign${keys.length === 1 ? "" : "s"} stored locally`;
-
-  const clearBtn = document.createElement("button");
-  clearBtn.type = "button";
-  clearBtn.className = "tile-btn tile-btn-remove";
-  clearBtn.textContent = "Clear all";
-  clearBtn.addEventListener("click", async () => {
-    if (!confirm("Remove all locally uploaded signs? This only clears your browser — nothing in the repo changes.")) {
-      return;
-    }
-    const all = await idbAllKeys();
-    for (const key of all) {
-      await removeUpload(key);
-      tileHandlers.get(key)?.refresh();
-    }
-  });
-
-  uploadBadge.append(line, clearBtn);
-};
-
-// ---------------------------------------------------------------------------
 // Modal
 // ---------------------------------------------------------------------------
-const renderModalAsset = async (asset) => {
+const renderModalAsset = (asset) => {
   modalTitle.textContent = asset.name;
   modalPreview.replaceChildren(createPlaceholder("Loading..."));
 
-  const localUrl = await loadUpload(asset.file);
   const fullImage = new Image();
   fullImage.alt = asset.name;
 
   fullImage.addEventListener("error", () => {
-    modalPreview.replaceChildren(createPlaceholder(`Missing image: ${assetRoot}${asset.file}`));
+    modalPreview.replaceChildren(createPlaceholder(`Missing image: ${asset.file}`));
   });
-
   fullImage.addEventListener("load", () => {
     modalPreview.replaceChildren(fullImage);
   });
 
-  fullImage.src = localUrl || `${assetRoot}${asset.file}`;
+  fullImage.src = `${assetRoot}${asset.file}`;
 };
 
 const updateModalNavigation = () => {
-  const atStart = activeAssetIndex <= 0;
-  const atEnd = activeAssetIndex >= allAssets.length - 1;
-  modalPrev.disabled = atStart;
-  modalNext.disabled = atEnd;
+  modalPrev.disabled = activeAssetIndex <= 0;
+  modalNext.disabled = activeAssetIndex >= allAssets.length - 1;
 };
 
 const openModalByIndex = (index) => {
@@ -750,10 +358,5 @@ document.addEventListener("keydown", (event) => {
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
-contentRoot.append(buildUploadBar());
 buildNav();
 setupActiveNavigation();
-
-// Mount the sidebar badge + load current count
-document.querySelector(".sidebar").append(uploadBadge);
-updateUploadBadge();
