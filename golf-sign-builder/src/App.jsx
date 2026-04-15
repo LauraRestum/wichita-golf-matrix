@@ -7,6 +7,8 @@ import './App.css'
 
 function App() {
   const [selectedTemplate, setSelectedTemplate] = useState(null)
+  const [logoUrl, setLogoUrl] = useState(null)
+  const [foundationName] = useState('Your Foundation Name')
 
   return (
     <div className="app">
@@ -18,8 +20,12 @@ function App() {
           selectedId={selectedTemplate?.id}
           onSelect={setSelectedTemplate}
         />
-        <LogoUpload />
-        <PreviewCanvas selectedTemplate={selectedTemplate} />
+        <LogoUpload onLogoUpload={setLogoUrl} />
+        <PreviewCanvas
+          selectedTemplate={selectedTemplate}
+          logoUrl={logoUrl}
+          foundationName={foundationName}
+        />
         <ExportBar />
       </main>
     </div>

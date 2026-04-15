@@ -126,3 +126,106 @@
   text-align: center;
   color: #1B365D;
 }
+
+/* Logo upload */
+.logo-upload {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.logo-upload__input {
+  display: none;
+}
+
+.logo-upload__button {
+  background-color: #1B365D;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.logo-upload__button:hover {
+  background-color: #264b80;
+  box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.35);
+}
+
+.logo-upload__button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.55);
+}
+
+.logo-upload__filename {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.logo-upload__error {
+  margin: 0.75rem 0 0 0 !important;
+  color: #b3261e !important;
+  font-size: 0.9rem;
+}
+
+/* Preview canvas */
+.preview-stage {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: #f5f7fa;
+  border-radius: 6px;
+}
+
+.preview-template {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  user-select: none;
+}
+
+.preview-header {
+  background-color: #1B365D;
+  color: #ffffff;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 4px solid #7CB342;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.preview-header__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.preview-header__foundation {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.preview-logo {
+  position: absolute;
+  max-width: 50%;
+  max-height: 50%;
+  border: 1px dashed transparent;
+  border-radius: 2px;
+  padding: 2px;
+  box-sizing: border-box;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.preview-logo--active {
+  border-color: rgba(27, 54, 93, 0.5);
+}
