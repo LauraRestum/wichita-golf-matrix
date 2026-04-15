@@ -20,6 +20,7 @@ const sectionConfig = [
         id: "event-sponsors",
         title: "Event Sponsors — 30x30 Foam Board (Easel)",
         assets: [
+          { name: "All Sponsors", file: "30x30_allsponsor.jpg" },
           {
             name: "Presenting Sponsor — High Touch Technologies, Inc.",
             file: "30x30_presenting_high-touch.jpg",
@@ -39,7 +40,7 @@ const sectionConfig = [
         title: "Special Placement Sponsors (Non-Standard)",
         assets: [
           { name: "Beverage Cart — IMA, Inc.", file: "special_beverage-cart_ima.jpg" },
-          { name: "Golf Cart — Dakota Western", file: "special_golf-cart_dakota-western.jpg" },
+          { name: "Golf Cart — TBD", file: "special_golf-cart_TBD.jpg" },
         ],
       },
       {
@@ -82,14 +83,20 @@ const sectionConfig = [
         assets: [
           { name: "Hutton", file: "24x18_pin-flag_hutton.jpg" },
           { name: "ADS, Inc.", file: "24x18_pin-flag_ads.jpg" },
-          { name: "Enza Financial, LLC", file: "24x18_pin-flag_enza-financial.jpg" },
-          { name: "Capital Federal Foundation", file: "24x18_pin-flag_capital-federal.jpg" },
+        ],
+      },
+      {
+        id: "hole-sponsors-teebox",
+        title: "Hole Sponsors — Small Format Signs (24x18) / Tee Box Sponsors",
+        assets: [
+          { name: "Aloft Hotel Wichita", file: "24x18_teebox_aloft.jpg" },
+          { name: "Capital Federal Foundation", file: "24x18_teebox_capitalfederal.jpg" },
+          { name: "Enza Financial, LLC", file: "24x18_teebox_enza-financial.jpg" },
+          { name: "Pratt Industries", file: "24x18_teebox_pratt-industries.jpg" },
           {
             name: "Wichita State University NIAR",
-            file: "24x18_pin-flag_wichita-state-niar.jpg",
+            file: "24x18_teebox_wichita-state-niar.jpg",
           },
-          { name: "Aloft Hotel Wichita", file: "24x18_pin-flag_aloft-hotel.jpg" },
-          { name: "Pratt Industries", file: "24x18_pin-flag_pratt-industries.jpg" },
         ],
       },
       {
@@ -140,6 +147,78 @@ const modalNext = document.getElementById("modal-next");
 const allAssets = sectionConfig.flatMap((group) => group.sections.flatMap((section) => section.assets));
 const assetByFile = new Map(allAssets.map((asset) => [asset.file, asset]));
 let activeAssetIndex = -1;
+
+// ---------------------------------------------------------------------------
+// Fuzzy filename matcher. Users rarely get the exact filename right when
+// dropping art — tokens differ by separator, casing, or extra descriptors
+// ("aloft-hotel" vs "aloft", "Capital Federal" vs "capitalfederal"). We fall
+// back to token overlap, preferring the asset with the clearest lead.
+// ---------------------------------------------------------------------------
+const stripExt = (name) => name.toLowerCase().replace(/\.[^.]+$/, "");
+const squishFilename = (name) => stripExt(name).replace(/[^a-z0-9]/g, "");
+const tokenizeFilename = (name) =>
+  stripExt(name)
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+
+const FUZZY_THRESHOLD = 0.75;
+
+const findAssetByFilename = (filename) => {
+  // 1. Exact filename match (fast path).
+  if (assetByFile.has(filename)) return assetByFile.get(filename);
+
+  // 2. Alphanumeric-only match handles separator / casing differences, e.g.
+  //    `30x30_all-sponsor.jpg` vs `30x30_allsponsor.jpg`, or
+  //    `24x18_Teebox_Aloft.JPG` vs `24x18_teebox_aloft.jpg`.
+  const upSquish = squishFilename(filename);
+  if (upSquish) {
+    for (const asset of allAssets) {
+      if (squishFilename(asset.file) === upSquish) return asset;
+    }
+    // 2b. Unambiguous substring match — catches `capital federal.jpg` →
+    //     `24x18_teebox_capitalfederal.jpg` when the user drops a bare
+    //     sponsor name. Requires >=4 chars and exactly one hit so generic
+    //     prefixes like `24x18` or `teebox` don't resolve arbitrarily.
+    if (upSquish.length >= 4) {
+      const hits = allAssets.filter((a) => {
+        const s = squishFilename(a.file);
+        return s.includes(upSquish) || upSquish.includes(s);
+      });
+      if (hits.length === 1) return hits[0];
+    }
+  }
+
+  // 3. Token overlap handles missing/extra descriptors, e.g.
+  //    `aloft-hotel.jpg` → `24x18_teebox_aloft.jpg`.
+  const uploaded = tokenizeFilename(filename);
+  if (!uploaded.length) return null;
+  const uploadedSet = new Set(uploaded);
+
+  let best = null;
+  let bestScore = 0;
+  let tied = false;
+
+  for (const asset of allAssets) {
+    const target = tokenizeFilename(asset.file);
+    if (!target.length) continue;
+    let shared = 0;
+    for (const token of target) if (uploadedSet.has(token)) shared += 1;
+    // Score by coverage of the smaller side — rewards partial names like
+    // `aloft.jpg` matching `24x18_teebox_aloft.jpg` without inflating when
+    // two assets happen to share generic tokens (24, 18, pin, flag, ...).
+    const score = shared / Math.min(uploaded.length, target.length);
+    if (score > bestScore) {
+      best = asset;
+      bestScore = score;
+      tied = false;
+    } else if (score === bestScore && score > 0 && asset !== best) {
+      tied = true;
+    }
+  }
+
+  if (!best || bestScore < FUZZY_THRESHOLD || tied) return null;
+  return best;
+};
 
 // ---------------------------------------------------------------------------
 // Local-only uploads (IndexedDB). Lets you preview sign art in the matrix
@@ -504,23 +583,32 @@ const buildUploadBar = () => {
 };
 
 const handleBulkFiles = async (files) => {
-  const matched = [];
+  const exact = [];
+  const fuzzy = [];
   const unmatched = [];
   for (const file of files) {
     if (!file.type.startsWith("image/")) continue;
-    const asset = assetByFile.get(file.name);
+    const asset = findAssetByFilename(file.name);
     if (!asset) {
       unmatched.push(file.name);
       continue;
     }
     await storeUpload(asset.file, file);
-    matched.push(file.name);
     tileHandlers.get(asset.file)?.refresh();
+    if (file.name === asset.file) {
+      exact.push(file.name);
+    } else {
+      fuzzy.push(`${file.name} → ${asset.file}`);
+    }
   }
 
-  if (matched.length || unmatched.length) {
+  if (exact.length || fuzzy.length || unmatched.length) {
     const parts = [];
-    if (matched.length) parts.push(`${matched.length} matched and stored.`);
+    const matchedCount = exact.length + fuzzy.length;
+    if (matchedCount) parts.push(`${matchedCount} matched and stored.`);
+    if (fuzzy.length) {
+      parts.push(`Fuzzy-matched (close filename):\n - ${fuzzy.join("\n - ")}`);
+    }
     if (unmatched.length) {
       parts.push(
         `${unmatched.length} didn't match any expected filename:\n - ${unmatched.join("\n - ")}`
