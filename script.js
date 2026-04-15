@@ -138,8 +138,107 @@ const modalPrev = document.getElementById("modal-prev");
 const modalNext = document.getElementById("modal-next");
 
 const allAssets = sectionConfig.flatMap((group) => group.sections.flatMap((section) => section.assets));
+const assetByFile = new Map(allAssets.map((asset) => [asset.file, asset]));
 let activeAssetIndex = -1;
 
+// ---------------------------------------------------------------------------
+// Local-only uploads (IndexedDB). Lets you preview sign art in the matrix
+// without committing anything to the repo — no pushes, no builds.
+// ---------------------------------------------------------------------------
+const DB_NAME = "wgm-sign-uploads";
+const STORE = "files";
+let dbPromise;
+
+const openDb = () => {
+  if (!dbPromise) {
+    dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(STORE);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  return dbPromise;
+};
+
+const idbGet = async (key) => {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction(STORE, "readonly").objectStore(STORE).get(key);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+};
+
+const idbPut = async (key, value) => {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+};
+
+const idbDelete = async (key) => {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+};
+
+const idbAllKeys = async () => {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction(STORE, "readonly").objectStore(STORE).getAllKeys();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+};
+
+// In-memory cache of file -> object URL (reused for tile + modal previews)
+const uploadUrls = new Map();
+// file -> tile refresh callback, so bulk/clear actions can re-render tiles
+const tileHandlers = new Map();
+
+const revokeUrl = (file) => {
+  const prev = uploadUrls.get(file);
+  if (prev) {
+    URL.revokeObjectURL(prev);
+    uploadUrls.delete(file);
+  }
+};
+
+const loadUpload = async (file) => {
+  if (uploadUrls.has(file)) return uploadUrls.get(file);
+  const blob = await idbGet(file);
+  if (!blob) return null;
+  const url = URL.createObjectURL(blob);
+  uploadUrls.set(file, url);
+  return url;
+};
+
+const storeUpload = async (file, blob) => {
+  await idbPut(file, blob);
+  revokeUrl(file);
+  const url = URL.createObjectURL(blob);
+  uploadUrls.set(file, url);
+  updateUploadBadge();
+  return url;
+};
+
+const removeUpload = async (file) => {
+  await idbDelete(file);
+  revokeUrl(file);
+  updateUploadBadge();
+};
+
+// ---------------------------------------------------------------------------
+// Tiles
+// ---------------------------------------------------------------------------
 const createPlaceholder = (label = "Image not uploaded yet") => {
   const holder = document.createElement("div");
   holder.className = "placeholder";
@@ -147,29 +246,44 @@ const createPlaceholder = (label = "Image not uploaded yet") => {
   return holder;
 };
 
-const buildAssetTile = (asset) => {
-  const button = document.createElement("button");
-  button.className = "tile";
-  button.type = "button";
-
-  const preview = document.createElement("div");
-  preview.className = "tile-preview";
+const renderTilePreview = (preview, asset, localUrl) => {
+  preview.replaceChildren(
+    createPlaceholder(localUrl ? "Loading local upload..." : "Checking /data/signs/ for image...")
+  );
 
   const image = new Image();
   image.loading = "lazy";
   image.alt = asset.name;
-  image.src = `${assetRoot}${asset.file}`;
 
   image.addEventListener("error", () => {
     image.remove();
-    preview.append(createPlaceholder());
+    preview.replaceChildren(createPlaceholder());
   });
 
   image.addEventListener("load", () => {
     preview.replaceChildren(image);
   });
 
-  preview.append(createPlaceholder("Checking /data/signs/ for image..."));
+  image.src = localUrl || `${assetRoot}${asset.file}`;
+};
+
+const buildAssetTile = (asset) => {
+  const card = document.createElement("div");
+  card.className = "tile";
+
+  const preview = document.createElement("div");
+  preview.className = "tile-preview";
+  preview.setAttribute("role", "button");
+  preview.tabIndex = 0;
+  preview.setAttribute("aria-label", `Preview ${asset.name}`);
+
+  preview.addEventListener("click", () => openModal(asset));
+  preview.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openModal(asset);
+    }
+  });
 
   const body = document.createElement("div");
   body.className = "tile-body";
@@ -178,16 +292,106 @@ const buildAssetTile = (asset) => {
   title.className = "tile-title";
   title.textContent = asset.name;
 
-  const file = document.createElement("p");
-  file.className = "tile-file";
-  file.textContent = `Expected file: ${assetRoot}${asset.file}`;
+  const fileLabel = document.createElement("p");
+  fileLabel.className = "tile-file";
+  fileLabel.textContent = `Expected file: ${assetRoot}${asset.file}`;
 
-  body.append(title, file);
-  button.append(preview, body);
+  const status = document.createElement("p");
+  status.className = "tile-status";
+  status.textContent = "Stored locally in your browser";
+  status.hidden = true;
 
-  button.addEventListener("click", () => openModal(asset));
+  const actions = document.createElement("div");
+  actions.className = "tile-actions";
 
-  return button;
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.hidden = true;
+
+  const uploadBtn = document.createElement("button");
+  uploadBtn.type = "button";
+  uploadBtn.className = "tile-btn";
+  uploadBtn.textContent = "Upload";
+
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.className = "tile-btn tile-btn-remove";
+  removeBtn.textContent = "Remove";
+  removeBtn.hidden = true;
+
+  const applyLocalState = (hasLocal) => {
+    uploadBtn.textContent = hasLocal ? "Replace" : "Upload";
+    removeBtn.hidden = !hasLocal;
+    status.hidden = !hasLocal;
+  };
+
+  const refreshFromStore = async () => {
+    const url = await loadUpload(asset.file);
+    applyLocalState(Boolean(url));
+    renderTilePreview(preview, asset, url);
+  };
+
+  const handleFile = async (file) => {
+    if (!file || !file.type.startsWith("image/")) {
+      alert("Please pick an image file.");
+      return;
+    }
+    try {
+      const url = await storeUpload(asset.file, file);
+      applyLocalState(true);
+      renderTilePreview(preview, asset, url);
+      const idx = allAssets.findIndex((a) => a.file === asset.file);
+      if (idx === activeAssetIndex && !modal.hidden) {
+        renderModalAsset(asset);
+      }
+    } catch (err) {
+      console.error("Upload failed", err);
+      alert("Sorry, that file couldn't be stored locally.");
+    }
+  };
+
+  uploadBtn.addEventListener("click", () => input.click());
+
+  input.addEventListener("change", async () => {
+    const chosen = input.files?.[0];
+    input.value = "";
+    if (chosen) await handleFile(chosen);
+  });
+
+  removeBtn.addEventListener("click", async () => {
+    await removeUpload(asset.file);
+    applyLocalState(false);
+    renderTilePreview(preview, asset, null);
+    const idx = allAssets.findIndex((a) => a.file === asset.file);
+    if (idx === activeAssetIndex && !modal.hidden) {
+      renderModalAsset(asset);
+    }
+  });
+
+  // Drag-and-drop directly on the preview
+  preview.addEventListener("dragover", (event) => {
+    if (event.dataTransfer?.types?.includes("Files")) {
+      event.preventDefault();
+      preview.classList.add("drag-over");
+    }
+  });
+  preview.addEventListener("dragleave", () => preview.classList.remove("drag-over"));
+  preview.addEventListener("drop", async (event) => {
+    event.preventDefault();
+    preview.classList.remove("drag-over");
+    const dropped = event.dataTransfer?.files?.[0];
+    if (dropped) await handleFile(dropped);
+  });
+
+  actions.append(input, uploadBtn, removeBtn);
+  body.append(title, fileLabel, status, actions);
+  card.append(preview, body);
+
+  tileHandlers.set(asset.file, { refresh: refreshFromStore });
+  refreshFromStore();
+
+  return card;
 };
 
 const buildSection = (section) => {
@@ -247,21 +451,143 @@ const buildNav = () => {
   });
 };
 
-const renderModalAsset = (asset) => {
-  modalTitle.textContent = asset.name;
-  modalPreview.replaceChildren();
+// ---------------------------------------------------------------------------
+// Bulk upload bar (match dropped files by filename)
+// ---------------------------------------------------------------------------
+const buildUploadBar = () => {
+  const bar = document.createElement("div");
+  bar.className = "upload-bar";
 
+  const info = document.createElement("div");
+  info.className = "upload-bar-info";
+  info.innerHTML =
+    "<strong>Upload signs without committing.</strong> Drop files here (matched by filename) " +
+    "or use the Upload button on any tile. Images are stored in this browser only — no builds triggered.";
+
+  const controls = document.createElement("div");
+  controls.className = "upload-bar-controls";
+
+  const bulkInput = document.createElement("input");
+  bulkInput.type = "file";
+  bulkInput.accept = "image/*";
+  bulkInput.multiple = true;
+  bulkInput.hidden = true;
+
+  const pickBtn = document.createElement("button");
+  pickBtn.type = "button";
+  pickBtn.className = "tile-btn";
+  pickBtn.textContent = "Pick files…";
+  pickBtn.addEventListener("click", () => bulkInput.click());
+
+  bulkInput.addEventListener("change", async () => {
+    await handleBulkFiles([...bulkInput.files]);
+    bulkInput.value = "";
+  });
+
+  controls.append(bulkInput, pickBtn);
+  bar.append(info, controls);
+
+  bar.addEventListener("dragover", (event) => {
+    if (event.dataTransfer?.types?.includes("Files")) {
+      event.preventDefault();
+      bar.classList.add("drag-over");
+    }
+  });
+  bar.addEventListener("dragleave", () => bar.classList.remove("drag-over"));
+  bar.addEventListener("drop", async (event) => {
+    event.preventDefault();
+    bar.classList.remove("drag-over");
+    await handleBulkFiles([...(event.dataTransfer?.files || [])]);
+  });
+
+  return bar;
+};
+
+const handleBulkFiles = async (files) => {
+  const matched = [];
+  const unmatched = [];
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) continue;
+    const asset = assetByFile.get(file.name);
+    if (!asset) {
+      unmatched.push(file.name);
+      continue;
+    }
+    await storeUpload(asset.file, file);
+    matched.push(file.name);
+    tileHandlers.get(asset.file)?.refresh();
+  }
+
+  if (matched.length || unmatched.length) {
+    const parts = [];
+    if (matched.length) parts.push(`${matched.length} matched and stored.`);
+    if (unmatched.length) {
+      parts.push(
+        `${unmatched.length} didn't match any expected filename:\n - ${unmatched.join("\n - ")}`
+      );
+    }
+    alert(parts.join("\n\n"));
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Sidebar badge: show count + clear-all
+// ---------------------------------------------------------------------------
+const uploadBadge = document.createElement("div");
+uploadBadge.className = "upload-badge";
+uploadBadge.hidden = true;
+
+const updateUploadBadge = async () => {
+  const keys = await idbAllKeys();
+  if (!keys.length) {
+    uploadBadge.hidden = true;
+    uploadBadge.replaceChildren();
+    return;
+  }
+  uploadBadge.hidden = false;
+  uploadBadge.replaceChildren();
+
+  const line = document.createElement("p");
+  line.textContent = `${keys.length} sign${keys.length === 1 ? "" : "s"} stored locally`;
+
+  const clearBtn = document.createElement("button");
+  clearBtn.type = "button";
+  clearBtn.className = "tile-btn tile-btn-remove";
+  clearBtn.textContent = "Clear all";
+  clearBtn.addEventListener("click", async () => {
+    if (!confirm("Remove all locally uploaded signs? This only clears your browser — nothing in the repo changes.")) {
+      return;
+    }
+    const all = await idbAllKeys();
+    for (const key of all) {
+      await removeUpload(key);
+      tileHandlers.get(key)?.refresh();
+    }
+  });
+
+  uploadBadge.append(line, clearBtn);
+};
+
+// ---------------------------------------------------------------------------
+// Modal
+// ---------------------------------------------------------------------------
+const renderModalAsset = async (asset) => {
+  modalTitle.textContent = asset.name;
+  modalPreview.replaceChildren(createPlaceholder("Loading..."));
+
+  const localUrl = await loadUpload(asset.file);
   const fullImage = new Image();
   fullImage.alt = asset.name;
-  fullImage.src = `${assetRoot}${asset.file}`;
 
   fullImage.addEventListener("error", () => {
-    modalPreview.append(createPlaceholder(`Missing image: ${assetRoot}${asset.file}`));
+    modalPreview.replaceChildren(createPlaceholder(`Missing image: ${assetRoot}${asset.file}`));
   });
 
   fullImage.addEventListener("load", () => {
-    modalPreview.append(fullImage);
+    modalPreview.replaceChildren(fullImage);
   });
+
+  fullImage.src = localUrl || `${assetRoot}${asset.file}`;
 };
 
 const updateModalNavigation = () => {
@@ -282,17 +608,13 @@ const openModalByIndex = (index) => {
 
 const openModal = (asset) => {
   const nextIndex = allAssets.findIndex((item) => item.file === asset.file);
-  if (nextIndex === -1) {
-    return;
-  }
+  if (nextIndex === -1) return;
   openModalByIndex(nextIndex);
 };
 
 const stepModalAsset = (step) => {
   const nextIndex = activeAssetIndex + step;
-  if (nextIndex < 0 || nextIndex >= allAssets.length) {
-    return;
-  }
+  if (nextIndex < 0 || nextIndex >= allAssets.length) return;
   openModalByIndex(nextIndex);
 };
 
@@ -331,23 +653,19 @@ modal.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (modal.hidden) {
-    return;
-  }
-
-  if (event.key === "Escape") {
-    closeModal();
-    return;
-  }
-
-  if (event.key === "ArrowLeft") {
-    stepModalAsset(-1);
-  }
-
-  if (event.key === "ArrowRight") {
-    stepModalAsset(1);
-  }
+  if (modal.hidden) return;
+  if (event.key === "Escape") return closeModal();
+  if (event.key === "ArrowLeft") stepModalAsset(-1);
+  if (event.key === "ArrowRight") stepModalAsset(1);
 });
 
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+contentRoot.append(buildUploadBar());
 buildNav();
 setupActiveNavigation();
+
+// Mount the sidebar badge + load current count
+document.querySelector(".sidebar").append(uploadBadge);
+updateUploadBadge();
