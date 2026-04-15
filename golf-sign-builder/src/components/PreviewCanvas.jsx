@@ -3,10 +3,19 @@ import { useEffect, useRef, useState } from 'react'
 const MAX_WIDTH = 600
 const MAX_HEIGHT = 500
 
-function PreviewCanvas({ selectedTemplate, logoUrl, foundationName }) {
+function PreviewCanvas({ selectedTemplate, logoUrl, foundationName, previewRef }) {
   const containerRef = useRef(null)
   const logoRef = useRef(null)
   const dragOffset = useRef({ x: 0, y: 0 })
+
+  // Assign the same DOM node to both the internal container ref and
+  // the forwarded previewRef so ExportBar can target .preview-template.
+  const setTemplateRef = (node) => {
+    containerRef.current = node
+    if (previewRef) {
+      previewRef.current = node
+    }
+  }
 
   const [position, setPosition] = useState({ x: 20, y: 20 })
   const [isDragging, setIsDragging] = useState(false)
@@ -89,7 +98,7 @@ function PreviewCanvas({ selectedTemplate, logoUrl, foundationName }) {
       </p>
       <div className="preview-stage">
         <div
-          ref={containerRef}
+          ref={setTemplateRef}
           className="preview-template"
           style={{ width: `${previewWidth}px`, height: `${previewHeight}px` }}
         >
