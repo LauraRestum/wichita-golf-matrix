@@ -2,35 +2,45 @@ const TEMPLATES = [
   {
     id: 'sponsor-landscape',
     name: 'Sponsor Sign (Landscape)',
+    dimensions: '30 x 18 in',
     shape: { width: 120, height: 80 },
   },
   {
     id: 'sponsor-portrait',
     name: 'Sponsor Sign (Portrait)',
+    dimensions: '18 x 30 in',
     shape: { width: 80, height: 120 },
   },
   {
     id: 'vip-welcome',
     name: 'VIP Welcome Sign',
+    dimensions: '30 x 30 in',
     shape: { width: 120, height: 80 },
   },
   {
     id: 'rules-info',
-    name: 'Rules/Info Sign',
+    name: 'Rules / Info Sign',
+    dimensions: '24 x 36 in',
     shape: { width: 90, height: 120 },
   },
   {
     id: 'corporate-partners',
     name: 'Corporate Partners Board',
+    dimensions: '48 x 24 in',
     shape: { width: 140, height: 70 },
   },
 ]
 
-function TemplatePicker({ selectedId, onSelect }) {
+function TemplatePicker({ step, selectedId, onSelect }) {
   return (
-    <section className="component-section">
-      <h2>Template Picker</h2>
-      <p className="section-subtitle">Choose a sign format to get started.</p>
+    <section className="step-section">
+      <div className="step-header">
+        <span className={`step-number${selectedId ? ' step-number--done' : ''}`}>{step}</span>
+        <h2>Choose a Template</h2>
+      </div>
+      <p className="section-subtitle">
+        Select the sign format that matches your placement.
+      </p>
       <div className="template-grid">
         {TEMPLATES.map((template) => {
           const isSelected = selectedId === template.id
@@ -52,6 +62,7 @@ function TemplatePicker({ selectedId, onSelect }) {
                 />
               </div>
               <span className="template-name">{template.name}</span>
+              <span className="template-dimensions">{template.dimensions}</span>
             </button>
           )
         })}
