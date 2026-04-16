@@ -26,8 +26,11 @@ const sectionConfig = [
             file: "30x30_presenting_high-touch.jpg",
           },
           { name: "19th Hole Sponsor — Farha Roofing", file: "30x30_19th-hole_farha-roofing.jpg" },
-          { name: "Breakfast Sponsor — ADS, Inc.", file: "30x30_breakfast_ads.jpg" },
-          { name: "Lunch Sponsor — Security 1st", file: "30x30_lunch_security-1st.jpg" },
+          {
+            name: "Hole-in-One Sponsor — Forvis Mazars",
+            file: "30x30_hole-in-one_forvis-mazars.jpg",
+          },
+          { name: "Lunch Sponsor — Security 1st Title", file: "30x30_lunch_security-1st.jpg" },
           { name: "Apparel Sponsor — Under Armour", file: "30x30_apparel_under-armour.jpg" },
           {
             name: "Cigar Experience Sponsor — Cigar Chateau",
@@ -36,29 +39,30 @@ const sectionConfig = [
         ],
       },
       {
-        id: "special-placement",
-        title: "Special Placement Sponsors (Non-Standard)",
+        id: "beverage-cart",
+        title: "Beverage Cart Sponsor — 6x4 Cling",
         assets: [
-          { name: "Beverage Cart — IMA, Inc.", file: "special_beverage-cart_ima.jpg" },
-          { name: "Golf Cart — TBD", file: "special_golf-cart_TBD.jpg" },
+          { name: "Beverage Cart Sponsor — IMA, Inc.", file: "6x4_beverage-cart_ima.jpg" },
         ],
       },
       {
         id: "contest-sponsors",
-        title: "Contest Sponsors — 30x18 Staked Signs (Title + Logo)",
+        title: "Contest Sponsors — 30x18 Staked Signs",
         assets: [
-          { name: "Longest Putt — Dakota Western", file: "30x18_longest-putt_dakota-western.jpg" },
           {
-            name: "Longest Drive — Eby Construction Company",
-            file: "30x18_longest-drive_eby-construction.jpg",
+            name: "Longest Drive — Dakota Western",
+            file: "30x18_longest-drive_dakota-western.jpg",
+          },
+          {
+            name: "Longest Putt — Eby Construction Company",
+            file: "30x18_longest-putt_eby-construction.jpg",
           },
           { name: "Closest to the Pin — Vornado Air", file: "30x18_closest-to-pin_vornado.jpg" },
-          { name: "Buy a Hole-In-One — Farris Mazars", file: "30x18_hole-in-one_farris-mazars.jpg" },
         ],
       },
       {
         id: "corporate-sponsors",
-        title: "Corporate Sponsors — 30x18 Staked Signs (Title + Logo)",
+        title: "Corporate Business Partners — 30x18 Staked Signs",
         assets: [
           { name: "S.P. Richards Company", file: "30x18_corporate_sp-richards.jpg" },
           { name: "6 Meridian", file: "30x18_corporate_6-meridian.jpg" },
@@ -68,43 +72,43 @@ const sectionConfig = [
       },
       {
         id: "hole-sponsors-ace",
-        title: "Hole Sponsors — Small Format Signs (24x18) / Ace Sponsors",
+        title: "Ace Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Belleville Boot Company", file: "24x18_ace_belleville-boot.jpg" },
-          { name: "Summit Plastics", file: "24x18_ace_summit-plastics.jpg" },
+          { name: "Summit Films", file: "24x18_ace_summit-films.jpg" },
           { name: "eShipping", file: "24x18_ace_eshipping.jpg" },
           { name: "Patricia A. Peer Window Gallery", file: "24x18_ace_peer-window-gallery.jpg" },
-          { name: "PHI Plastics", file: "24x18_ace_phi-plastics.jpg" },
+          { name: "Pitt Plastics", file: "24x18_ace_pitt-plastics.jpg" },
         ],
       },
       {
         id: "hole-sponsors-pin-flag",
-        title: "Hole Sponsors — Small Format Signs (24x18) / Pin Flag Sponsors",
+        title: "Pin Flag Sponsor — 24x18 Staked Signs",
         assets: [
           { name: "Hutton", file: "24x18_pin-flag_hutton.jpg" },
-          { name: "ADS, Inc.", file: "24x18_pin-flag_ads.jpg" },
         ],
       },
       {
         id: "hole-sponsors-teebox",
-        title: "Hole Sponsors — Small Format Signs (24x18) / Tee Box Sponsors",
+        title: "Tee Box Sponsors — 24x18 Staked Signs",
         assets: [
-          { name: "Aloft Hotel Wichita", file: "24x18_teebox_aloft.jpg" },
-          { name: "Capital Federal Foundation", file: "24x18_teebox_capitalfederal.jpg" },
+          { name: "ADS, Inc.", file: "24x18_teebox_ads.jpg" },
           { name: "Enza Financial, LLC", file: "24x18_teebox_enza-financial.jpg" },
-          { name: "Pratt Industries", file: "24x18_teebox_pratt-industries.jpg" },
+          { name: "Capitol Federal Foundation", file: "24x18_teebox_capitalfederal.jpg" },
           {
             name: "Wichita State University NIAR",
             file: "24x18_teebox_wichita-state-niar.jpg",
           },
+          { name: "Aloft Hotel Wichita", file: "24x18_teebox_aloft.jpg" },
+          { name: "Pratt Industries", file: "24x18_teebox_pratt-industries.jpg" },
         ],
       },
       {
         id: "hole-sponsors-birdie",
-        title: "Hole Sponsors — Small Format Signs (24x18) / Birdie Sponsors",
+        title: "Birdie Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Delta Dental of Kansas", file: "24x18_birdie_delta-dental.jpg" },
-          { name: "Envi Environmental", file: "24x18_birdie_envi-environmental.jpg" },
+          { name: "iSi Environmental", file: "24x18_birdie_isi-environmental.jpg" },
           { name: "IdeaTek", file: "24x18_birdie_ideatek.jpg" },
           { name: "Foulston Siefkin, LLP", file: "24x18_birdie_foulston-siefkin.jpg" },
         ],
