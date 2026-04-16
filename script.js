@@ -14,6 +14,18 @@ const sectionConfig = [
     ],
   },
   {
+    group: "Mesh Banner",
+    sections: [
+      {
+        id: "mesh-banner",
+        title: "7' x 4' Mesh Banner",
+        assets: [
+          { name: "7' x 4' Mesh Banner", file: "7' x 4' MESH BANNER -ICT.jpg" },
+        ],
+      },
+    ],
+  },
+  {
     group: "Golf Tournament",
     sections: [
       {
@@ -133,10 +145,7 @@ const sectionConfig = [
       {
         id: "day-of-materials",
         title: "Day-Of Materials",
-        assets: [
-          { name: "PowerPoint", file: "day-of_powerpoint.jpg" },
-          { name: "7' x 4' Mesh Banner", file: "7' x 4' MESH BANNER -ICT.jpg" },
-        ],
+        assets: [{ name: "PowerPoint", file: "day-of_powerpoint.jpg" }],
       },
     ],
   },
