@@ -2,7 +2,7 @@ import { useState } from 'react'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 
-function ExportBar({ previewRef }) {
+function ExportBar({ step, previewRef, canExport }) {
   const [isExporting, setIsExporting] = useState(false)
   const [error, setError] = useState(null)
 
@@ -44,19 +44,24 @@ function ExportBar({ previewRef }) {
   }
 
   return (
-    <section className="component-section">
-      <h2>Export</h2>
+    <section className="step-section">
+      <div className="step-header">
+        <span className={`step-number${canExport ? ' step-number--done' : ''}`}>{step}</span>
+        <h2>Export</h2>
+      </div>
       <p className="section-subtitle">
-        Download your sign as a print-ready PDF.
+        {canExport
+          ? 'Your sign is ready — download it as a print-ready PDF.'
+          : 'Select a template and upload a logo to enable export.'}
       </p>
       <div className="export-bar">
         <button
           type="button"
           className="export-bar__button export-bar__button--primary"
           onClick={handleDownloadPdf}
-          disabled={isExporting}
+          disabled={!canExport || isExporting}
         >
-          {isExporting ? 'Preparing PDF…' : 'Download PDF'}
+          {isExporting ? 'Preparing PDF\u2026' : 'Download PDF'}
         </button>
         <button
           type="button"

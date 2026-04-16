@@ -1,8 +1,39 @@
 :root {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* Brand colors — shared with Collateral Matrix */
+  --brand-blue: #022855;
+  --brand-green: #78be21;
+  --brand-blue-light: #0a3a72;
+  --brand-green-dark: #5f9a10;
+
+  /* Neutral palette */
+  --text-primary: #172033;
+  --text-secondary: #555;
+  --text-muted: #5f6b7a;
+  --text-placeholder: #999;
+  --border: #dce3ed;
+  --border-light: #e8ecf1;
+  --surface: #f5f8fc;
+  --white: #ffffff;
+  --error: #b3261e;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(2, 40, 85, 0.08);
+  --shadow-md: 0 4px 12px rgba(2, 40, 85, 0.1);
+  --shadow-focus: 0 0 0 3px rgba(120, 190, 33, 0.35);
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+
+  /* Typography */
+  font-family: 'Montserrat', system-ui, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
-  color: #1B365D;
-  background-color: #ffffff;
+  color: var(--text-primary);
+  background-color: var(--white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -14,7 +45,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #ffffff;
+  background-color: var(--white);
 }
 
 #root {

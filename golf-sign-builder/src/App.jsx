@@ -13,6 +13,13 @@ function App() {
   const previewRef = useRef(null)
 
   const canExport = Boolean(selectedTemplate && logoUrl)
+  const hasAnyInput = Boolean(selectedTemplate || logoUrl || foundationName)
+
+  const handleReset = () => {
+    setSelectedTemplate(null)
+    setLogoUrl(null)
+    setFoundationName('')
+  }
 
   return (
     <div className="app">
@@ -20,8 +27,11 @@ function App() {
         <h1>Fore Vision Sign Builder</h1>
       </header>
       <main className="app-main">
-        <section className="component-section">
-          <h2>Foundation Name</h2>
+        <section className="step-section">
+          <div className="step-header">
+            <span className={`step-number${foundationName ? ' step-number--done' : ''}`}>1</span>
+            <h2>Foundation Name</h2>
+          </div>
           <p className="section-subtitle">
             This appears under the Fore Vision header on every sign.
           </p>
@@ -37,17 +47,38 @@ function App() {
           </label>
         </section>
         <TemplatePicker
+          step={2}
           selectedId={selectedTemplate?.id}
           onSelect={setSelectedTemplate}
         />
-        <LogoUpload onLogoUpload={setLogoUrl} />
+        <LogoUpload
+          step={3}
+          logoUrl={logoUrl}
+          onLogoUpload={setLogoUrl}
+        />
         <PreviewCanvas
+          step={4}
           selectedTemplate={selectedTemplate}
           logoUrl={logoUrl}
           foundationName={foundationName}
           previewRef={previewRef}
         />
-        {canExport && <ExportBar previewRef={previewRef} />}
+        <ExportBar
+          step={5}
+          previewRef={previewRef}
+          canExport={canExport}
+        />
+        {hasAnyInput && (
+          <div className="reset-bar">
+            <button
+              type="button"
+              className="reset-bar__button"
+              onClick={handleReset}
+            >
+              Start over
+            </button>
+          </div>
+        )}
       </main>
     </div>
   )
