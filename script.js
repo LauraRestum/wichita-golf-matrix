@@ -97,7 +97,7 @@ const sectionConfig = [
         id: "hole-sponsors-pin-flag",
         title: "Pin Flag Sponsor — 24x18 Staked Signs",
         assets: [
-          { name: "Rolling Hills", file: "24x18_pin-flag_rolling-hills.jpg" },
+          { name: "Hutton", placeholder: "Done by RH" },
         ],
       },
       {
@@ -176,6 +176,11 @@ const createPlaceholder = (label = "Image not uploaded yet") => {
 };
 
 const renderTilePreview = (preview, asset) => {
+  if (asset.placeholder) {
+    preview.replaceChildren(createPlaceholder(asset.placeholder));
+    return;
+  }
+
   preview.replaceChildren(createPlaceholder("Loading..."));
 
   const image = new Image();
@@ -289,6 +294,12 @@ const buildNav = () => {
 // ---------------------------------------------------------------------------
 const renderModalAsset = (asset) => {
   modalTitle.textContent = asset.name;
+
+  if (asset.placeholder) {
+    modalPreview.replaceChildren(createPlaceholder(asset.placeholder));
+    return;
+  }
+
   modalPreview.replaceChildren(createPlaceholder("Loading..."));
 
   const fullImage = new Image();
