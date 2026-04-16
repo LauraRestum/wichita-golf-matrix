@@ -189,7 +189,7 @@ const renderTilePreview = (preview, asset) => {
     preview.replaceChildren(image);
   });
 
-  image.src = `${assetRoot}${asset.file}`;
+  image.src = encodeURI(`${assetRoot}${asset.file}`);
 };
 
 const buildAssetTile = (asset) => {
@@ -302,7 +302,7 @@ const renderModalAsset = (asset) => {
     modalPreview.replaceChildren(fullImage);
   });
 
-  fullImage.src = `${assetRoot}${asset.file}`;
+  fullImage.src = encodeURI(`${assetRoot}${asset.file}`);
 };
 
 const updateModalNavigation = () => {
