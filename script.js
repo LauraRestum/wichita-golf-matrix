@@ -32,7 +32,7 @@ const sectionConfig = [
         id: "event-sponsors",
         title: "Event Sponsors — 30x30 Foam Board (Easel)",
         assets: [
-          { name: "All Sponsors", file: "30x30_allsponsor.jpg" },
+          { name: "All Sponsors", file: "30x30_AllSponsor-2.jpg" },
           {
             name: "Presenting Sponsor — High Touch Technologies, Inc.",
             file: "30x30_presenting_high-touch.jpg",
