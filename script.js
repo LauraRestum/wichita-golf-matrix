@@ -20,7 +20,7 @@ const sectionConfig = [
         id: "mesh-banner",
         title: "7' x 4' Mesh Banner",
         assets: [
-          { name: "7' x 4' Mesh Banner", file: "7' x 4' MESH BANNER -ICT.jpg" },
+          { name: "7' x 4' Mesh Banner", file: "7’ x 4’ MESH BANNER -ICT.jpg" },
         ],
       },
     ],
