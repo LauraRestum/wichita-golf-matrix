@@ -147,6 +147,9 @@ const modalNext = document.getElementById("modal-next");
 
 const allAssets = sectionConfig.flatMap((group) => group.sections.flatMap((section) => section.assets));
 let activeAssetIndex = -1;
+let tilePreviewObserver = null;
+
+const PRIORITY_TILE_COUNT = 6;
 
 // ---------------------------------------------------------------------------
 // Tiles
@@ -158,11 +161,15 @@ const createPlaceholder = (label = "Image not uploaded yet") => {
   return holder;
 };
 
-const renderTilePreview = (preview, asset) => {
+const renderTilePreview = (preview, asset, { priority = false } = {}) => {
   preview.replaceChildren(createPlaceholder("Loading..."));
 
   const image = new Image();
-  image.loading = "lazy";
+  image.loading = priority ? "eager" : "lazy";
+  image.decoding = "async";
+  if (priority) {
+    image.fetchPriority = "high";
+  }
   image.alt = asset.name;
 
   image.addEventListener("error", () => {
@@ -175,7 +182,19 @@ const renderTilePreview = (preview, asset) => {
   image.src = `${assetRoot}${asset.file}`;
 };
 
-const buildAssetTile = (asset) => {
+const queueTilePreview = (preview, asset, index) => {
+  if (index < PRIORITY_TILE_COUNT) {
+    renderTilePreview(preview, asset, { priority: true });
+    return;
+  }
+
+  preview.replaceChildren(createPlaceholder("Ready to load"));
+  preview.dataset.src = `${assetRoot}${asset.file}`;
+  preview.dataset.assetName = asset.name;
+  tilePreviewObserver?.observe(preview);
+};
+
+const buildAssetTile = (asset, index) => {
   const card = document.createElement("div");
   card.className = "tile";
 
@@ -207,7 +226,7 @@ const buildAssetTile = (asset) => {
   body.append(title, fileLabel);
   card.append(preview, body);
 
-  renderTilePreview(preview, asset);
+  queueTilePreview(preview, asset, index);
   return card;
 };
 
@@ -223,7 +242,8 @@ const buildSection = (section) => {
   grid.className = "grid";
 
   section.assets.forEach((asset) => {
-    grid.append(buildAssetTile(asset));
+    const assetIndex = allAssets.findIndex((item) => item.file === asset.file);
+    grid.append(buildAssetTile(asset, assetIndex));
   });
 
   el.append(heading, grid);
@@ -339,6 +359,44 @@ const setupActiveNavigation = () => {
   document.querySelectorAll(".section").forEach((section) => observer.observe(section));
 };
 
+const setupTilePreviewObserver = () => {
+  if (!("IntersectionObserver" in window)) {
+    document.querySelectorAll(".tile-preview[data-src]").forEach((preview) => {
+      renderTilePreview(
+        preview,
+        {
+          name: preview.dataset.assetName,
+          file: preview.dataset.src,
+        },
+        { priority: false }
+      );
+    });
+    return;
+  }
+
+  tilePreviewObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const preview = entry.target;
+        const source = preview.dataset.src;
+        const assetName = preview.dataset.assetName;
+        if (!source) return;
+
+        renderTilePreview(preview, { name: assetName, file: source }, { priority: false });
+        delete preview.dataset.src;
+        delete preview.dataset.assetName;
+        observer.unobserve(preview);
+      });
+    },
+    { rootMargin: "250px 0px", threshold: 0.01 }
+  );
+
+  document.querySelectorAll(".tile-preview[data-src]").forEach((preview) => {
+    tilePreviewObserver.observe(preview);
+  });
+};
+
 modalClose.addEventListener("click", closeModal);
 modalPrev.addEventListener("click", () => stepModalAsset(-1));
 modalNext.addEventListener("click", () => stepModalAsset(1));
@@ -358,5 +416,6 @@ document.addEventListener("keydown", (event) => {
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
+setupTilePreviewObserver();
 buildNav();
 setupActiveNavigation();
