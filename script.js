@@ -85,7 +85,7 @@ const sectionConfig = [
         id: "hole-sponsors-pin-flag",
         title: "Pin Flag Sponsor — 24x18 Staked Signs",
         assets: [
-          { name: "Hutton", file: "24x18_pin-flag_hutton.jpg" },
+          { name: "Rolling Hills", file: "24x18_pin-flag_rolling-hills.jpg" },
         ],
       },
       {
