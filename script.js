@@ -28,7 +28,7 @@ const sectionConfig = [
           { name: "19th Hole Sponsor — Farha Roofing", file: "30x30_19th-hole_farha-roofing.jpg" },
           {
             name: "Hole-in-One Sponsor — Forvis Mazars",
-            file: "30x30_hole-in-one_forvis-mazars.jpg",
+            file: "30x18-hole-in-one-forvismazars.jpg",
           },
           { name: "Lunch Sponsor — Security 1st Title", file: "30x30_lunch_security-1st.jpg" },
           { name: "Apparel Sponsor — Under Armour", file: "30x30_apparel_under-armour.jpg" },
@@ -42,7 +42,7 @@ const sectionConfig = [
         id: "beverage-cart",
         title: "Beverage Cart Sponsor — 6x4 Cling",
         assets: [
-          { name: "Beverage Cart Sponsor — IMA, Inc.", file: "6x4_beverage-cart_ima.jpg" },
+          { name: "Beverage Cart Sponsor — IMA, Inc.", file: "special_beverage-cart_ima.jpg" },
         ],
       },
       {
@@ -50,12 +50,12 @@ const sectionConfig = [
         title: "Contest Sponsors — 30x18 Staked Signs",
         assets: [
           {
-            name: "Longest Drive — Dakota Western",
-            file: "30x18_longest-drive_dakota-western.jpg",
+            name: "Longest Drive — Eby Construction Company",
+            file: "30x18_longest-drive_eby-construction.jpg",
           },
           {
-            name: "Longest Putt — Eby Construction Company",
-            file: "30x18_longest-putt_eby-construction.jpg",
+            name: "Longest Putt — Dakota Western",
+            file: "30x18_longest-putt_dakota-western.jpg",
           },
           { name: "Closest to the Pin — Vornado Air", file: "30x18_closest-to-pin_vornado.jpg" },
         ],
@@ -75,10 +75,10 @@ const sectionConfig = [
         title: "Ace Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Belleville Boot Company", file: "24x18_ace_belleville-boot.jpg" },
-          { name: "Summit Films", file: "24x18_ace_summit-films.jpg" },
+          { name: "Summit Plastics", file: "24x18_ace_summit-plastics.jpg" },
           { name: "eShipping", file: "24x18_ace_eshipping.jpg" },
           { name: "Patricia A. Peer Window Gallery", file: "24x18_ace_peer-window-gallery.jpg" },
-          { name: "Pitt Plastics", file: "24x18_ace_pitt-plastics.jpg" },
+          { name: "Phi Plastics", file: "24x18_ace_phi-plastics.jpg" },
         ],
       },
       {
@@ -108,7 +108,7 @@ const sectionConfig = [
         title: "Birdie Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Delta Dental of Kansas", file: "24x18_birdie_delta-dental.jpg" },
-          { name: "iSi Environmental", file: "24x18_birdie_isi-environmental.jpg" },
+          { name: "Envi Environmental", file: "24x18_birdie_envi-environmental.jpg" },
           { name: "IdeaTek", file: "24x18_birdie_ideatek.jpg" },
           { name: "Foulston Siefkin, LLP", file: "24x18_birdie_foulston-siefkin.jpg" },
         ],
@@ -119,27 +119,31 @@ const sectionConfig = [
         assets: [
           { name: "Mulligan Rules", file: "8.5x11_mulligan-rules.jpg" },
           { name: "Check-In Signs", file: "8.5x11_check-in.jpg" },
+          { name: "Printed Template", file: "8.5x11_printedtemplate.jpg" },
         ],
       },
       {
         id: "program",
         title: "Program",
         assets: [
-          { name: "Program — Front", file: "program_front.jpg" },
-          { name: "Program — Back", file: "program_back.jpg" },
+          { name: "Program — Front", file: "ICT-Golf-Program-26_1.jpg" },
+          { name: "Program — Back", file: "ICT-Golf-Program-26_2.jpg" },
         ],
       },
       {
         id: "day-of-materials",
         title: "Day-Of Materials",
-        assets: [{ name: "PowerPoint", file: "day-of_powerpoint.jpg" }],
+        assets: [
+          { name: "PowerPoint", file: "day-of_powerpoint.jpg" },
+          { name: "7' x 4' Mesh Banner", file: "7' x 4' MESH BANNER -ICT.jpg" },
+        ],
       },
     ],
   },
 ];
 
-// Images are committed to the repo root, so asset filenames resolve directly.
-const assetRoot = "";
+// Images live in the signs/ folder.
+const assetRoot = "signs/";
 const navRoot = document.getElementById("sidebar-nav");
 const contentRoot = document.getElementById("content");
 const modal = document.getElementById("asset-modal");
