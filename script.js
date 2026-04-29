@@ -40,7 +40,13 @@ const sectionConfig = [
           { name: "19th Hole Sponsor — Farha Roofing", file: "30x30_19th-hole_farha-roofing.jpg" },
           {
             name: "Hole-in-One Sponsor — Forvis Mazars",
-            file: "30x18-hole-in-one-forvismazars.jpg",
+            file: "30x30_hole-in-one_forvis-mazars.jpg",
+            placeholder: "Sign needed",
+          },
+          {
+            name: "Beverage Cart Sponsor — IMA, Inc.",
+            file: "30x30_beverage-cart_ima.jpg",
+            placeholder: "Sign needed",
           },
           { name: "Lunch Sponsor — Security 1st Title", file: "30x30_lunch_security-1st.jpg" },
           { name: "Apparel Sponsor — Under Armour", file: "30x30_apparel_under-armour.jpg" },
@@ -51,7 +57,17 @@ const sectionConfig = [
         ],
       },
       {
-        id: "beverage-cart",
+        id: "hole-in-one-staked",
+        title: "Hole-in-One Sponsor — 30x18 Staked Sign",
+        assets: [
+          {
+            name: "Hole-in-One Sponsor — Forvis Mazars",
+            file: "30x18_hole-in-one_forvis-mazars.jpg",
+          },
+        ],
+      },
+      {
+        id: "beverage-cart-cling",
         title: "Beverage Cart Sponsor — 6x4 Cling",
         assets: [
           { name: "Beverage Cart Sponsor — IMA, Inc.", file: "special_beverage-cart_ima.jpg" },
@@ -87,15 +103,23 @@ const sectionConfig = [
         title: "Ace Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Belleville Boot Company", file: "24x18_ace_belleville-boot.jpg" },
-          { name: "Summit Plastics", file: "24x18_ace_summit-plastics.jpg" },
+          {
+            name: "Summit Films",
+            file: "24x18_ace_summit-films.jpg",
+            placeholder: "Sign needed",
+          },
           { name: "eShipping", file: "24x18_ace_eshipping.jpg" },
           { name: "Patricia A. Peer Window Gallery", file: "24x18_ace_peer-window-gallery.jpg" },
-          { name: "Phi Plastics", file: "24x18_ace_phi-plastics.jpg" },
+          {
+            name: "Pitt Plastics",
+            file: "24x18_ace_pitt-plastics.jpg",
+            placeholder: "Sign needed",
+          },
         ],
       },
       {
         id: "hole-sponsors-pin-flag",
-        title: "Pin Flag Sponsor — 24x18 Staked Signs",
+        title: "Pin Flag Sponsor",
         assets: [
           { name: "Hutton", placeholder: "Done by RH" },
         ],
@@ -120,9 +144,18 @@ const sectionConfig = [
         title: "Birdie Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Delta Dental of Kansas", file: "24x18_birdie_delta-dental.jpg" },
-          { name: "Envi Environmental", file: "24x18_birdie_envi-environmental.jpg" },
+          {
+            name: "iSi Environmental",
+            file: "24x18_birdie_isi-environmental.jpg",
+            placeholder: "Sign needed",
+          },
           { name: "IdeaTek", file: "24x18_birdie_ideatek.jpg" },
           { name: "Foulston Siefkin, LLP", file: "24x18_birdie_foulston-siefkin.jpg" },
+          {
+            name: "Bank of America",
+            file: "24x18_birdie_bank-of-america.jpg",
+            placeholder: "Sign needed",
+          },
         ],
       },
       {
