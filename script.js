@@ -36,7 +36,7 @@ const sectionConfig = [
         id: "event-sponsors",
         title: "Event Sponsors — 30x30 Foam Board (Easel)",
         assets: [
-          { name: "All Sponsors", file: "30x30_AllSponsor-2.jpg" },
+          { name: "All Sponsors", file: "30x30_AllSponsor-3.jpg" },
           {
             name: "Presenting Sponsor — High Touch Technologies, Inc.",
             file: "30x30_presenting_high-touch.jpg",
@@ -44,14 +44,13 @@ const sectionConfig = [
           { name: "19th Hole Sponsor — Farha Roofing", file: "30x30_19th-hole_farha-roofing.jpg" },
           {
             name: "Hole-in-One Sponsor — Forvis Mazars",
-            file: "30x30_hole-in-one_forvis-mazars.jpg",
-            placeholder: "Sign needed",
+            file: "30x30_hole-in-one_ForvisMazars.jpg",
           },
           {
             name: "Beverage Cart Sponsor — IMA, Inc.",
-            file: "30x30_beverage-cart_ima.jpg",
-            placeholder: "Sign needed",
+            file: "30x30_beveragecart_IMA.jpg",
           },
+          { name: "Breakfast Sponsor — ADS, Inc.", file: "30x30_breakfast_ads.jpg" },
           { name: "Lunch Sponsor — Security 1st Title", file: "30x30_lunch_security-1st.jpg" },
           { name: "Apparel Sponsor — Under Armour", file: "30x30_apparel_under-armour.jpg" },
           {
@@ -66,7 +65,7 @@ const sectionConfig = [
         assets: [
           {
             name: "Hole-in-One Sponsor — Forvis Mazars",
-            file: "30x18_hole-in-one_forvis-mazars.jpg",
+            file: "30x18-hole-in-one-forvismazars.jpg",
           },
         ],
       },
@@ -75,6 +74,13 @@ const sectionConfig = [
         title: "Beverage Cart Sponsor — 6x4 Cling",
         assets: [
           { name: "Beverage Cart Sponsor — IMA, Inc.", file: "special_beverage-cart_ima.jpg" },
+        ],
+      },
+      {
+        id: "golf-cart-sponsor",
+        title: "Golf Cart Sponsor",
+        assets: [
+          { name: "Golf Cart Sponsor — TBD", file: "special_golf-cart_TBD.jpg" },
         ],
       },
       {
@@ -107,18 +113,10 @@ const sectionConfig = [
         title: "Ace Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Belleville Boot Company", file: "24x18_ace_belleville-boot.jpg" },
-          {
-            name: "Summit Films",
-            file: "24x18_ace_summit-films.jpg",
-            placeholder: "Sign needed",
-          },
+          { name: "Summit Plastics", file: "24x18_ace_summit-plastics.jpg" },
           { name: "eShipping", file: "24x18_ace_eshipping.jpg" },
           { name: "Patricia A. Peer Window Gallery", file: "24x18_ace_peer-window-gallery.jpg" },
-          {
-            name: "Pitt Plastics",
-            file: "24x18_ace_pitt-plastics.jpg",
-            placeholder: "Sign needed",
-          },
+          { name: "Phi Plastics", file: "24x18_ace_phi-plastics.jpg" },
         ],
       },
       {
@@ -141,6 +139,7 @@ const sectionConfig = [
           },
           { name: "Aloft Hotel Wichita", file: "24x18_teebox_aloft.jpg" },
           { name: "Pratt Industries", file: "24x18_teebox_pratt-industries.jpg" },
+          { name: "Bank of America", file: "24x18_teebox_bankofamerica.jpg" },
         ],
       },
       {
@@ -148,18 +147,9 @@ const sectionConfig = [
         title: "Birdie Sponsors — 24x18 Staked Signs",
         assets: [
           { name: "Delta Dental of Kansas", file: "24x18_birdie_delta-dental.jpg" },
-          {
-            name: "iSi Environmental",
-            file: "24x18_birdie_isi-environmental.jpg",
-            placeholder: "Sign needed",
-          },
+          { name: "ENVI Environmental", file: "24x18_birdie_envi-environmental.jpg" },
           { name: "IdeaTek", file: "24x18_birdie_ideatek.jpg" },
           { name: "Foulston Siefkin, LLP", file: "24x18_birdie_foulston-siefkin.jpg" },
-          {
-            name: "Bank of America",
-            file: "24x18_birdie_bank-of-america.jpg",
-            placeholder: "Sign needed",
-          },
         ],
       },
       {
@@ -177,6 +167,12 @@ const sectionConfig = [
         assets: [
           { name: "Program — Front", file: "ICT-Golf-Program-26_1.jpg" },
           { name: "Program — Back", file: "ICT-Golf-Program-26_2.jpg" },
+          {
+            name: "Program — Full PDF",
+            file: "ICT_Golf_Program_26.pdf",
+            url: "signs/ICT_Golf_Program_26.pdf",
+            placeholder: "Click filename to open PDF",
+          },
         ],
       },
       {
