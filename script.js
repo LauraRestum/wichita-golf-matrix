@@ -8,7 +8,11 @@ const sectionConfig = [
         assets: [
           { name: "Digital Invitation", file: "vip_digital-invitation.jpg" },
           { name: "30x30 Foam Board", file: "30x30_vip_foam-board.jpg" },
-          { name: "PowerPoint", file: "vip_powerpoint.jpg" },
+          {
+            name: "PowerPoint",
+            file: "vip_powerpoint.jpg",
+            url: "https://canva.link/ta5z0tr0ho4ry1j",
+          },
         ],
       },
     ],
@@ -178,7 +182,13 @@ const sectionConfig = [
       {
         id: "day-of-materials",
         title: "Day-Of Materials",
-        assets: [{ name: "PowerPoint", file: "day-of_powerpoint.jpg" }],
+        assets: [
+          {
+            name: "PowerPoint",
+            file: "day-of_powerpoint.jpg",
+            url: "https://canva.link/ta5z0tr0ho4ry1j",
+          },
+        ],
       },
     ],
   },
@@ -256,7 +266,16 @@ const buildAssetTile = (asset) => {
 
   const fileLabel = document.createElement("p");
   fileLabel.className = "tile-file";
-  fileLabel.textContent = asset.file;
+  if (asset.url) {
+    const link = document.createElement("a");
+    link.href = asset.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = asset.file;
+    fileLabel.append(link);
+  } else {
+    fileLabel.textContent = asset.file;
+  }
 
   body.append(title, fileLabel);
   card.append(preview, body);
