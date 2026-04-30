@@ -159,14 +159,8 @@ const sectionConfig = [
         id: "program",
         title: "Program",
         assets: [
-          { name: "Program — Front", file: "ICT-Golf-Program-26_1.jpg" },
-          { name: "Program — Back", file: "ICT-Golf-Program-26_2.jpg" },
-          {
-            name: "Program — Full PDF",
-            file: "ICT_Golf_Program_26.pdf",
-            url: "signs/ICT_Golf_Program_26.pdf",
-            placeholder: "Click filename to open PDF",
-          },
+          { name: "Program — Front", file: "Wichita-Program-Front-Back_1.jpg" },
+          { name: "Program — Back", file: "Wichita-Program-Front-Back_2.jpg" },
         ],
       },
       {
