@@ -60,16 +60,6 @@ const sectionConfig = [
         ],
       },
       {
-        id: "hole-in-one-staked",
-        title: "Hole-in-One Sponsor — 30x18 Staked Sign",
-        assets: [
-          {
-            name: "Hole-in-One Sponsor — Forvis Mazars",
-            file: "30x18-hole-in-one-forvismazars.jpg",
-          },
-        ],
-      },
-      {
         id: "beverage-cart-cling",
         title: "Beverage Cart Sponsor — 6x4 Cling",
         assets: [
@@ -87,6 +77,10 @@ const sectionConfig = [
         id: "contest-sponsors",
         title: "Contest Sponsors — 30x18 Staked Signs",
         assets: [
+          {
+            name: "Hole-in-One Sponsor — Forvis Mazars",
+            file: "30x18-hole-in-one-forvismazars.jpg",
+          },
           {
             name: "Longest Drive — Eby Construction Company",
             file: "30x18_longest-drive_eby-construction.jpg",
