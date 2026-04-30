@@ -50,7 +50,6 @@ const sectionConfig = [
             name: "Beverage Cart Sponsor — IMA, Inc.",
             file: "30x30_beveragecart_IMA.jpg",
           },
-          { name: "Breakfast Sponsor — ADS, Inc.", file: "30x30_breakfast_ads.jpg" },
           { name: "Lunch Sponsor — Security 1st Title", file: "30x30_lunch_security-1st.jpg" },
           { name: "Apparel Sponsor — Under Armour", file: "30x30_apparel_under-armour.jpg" },
           {
