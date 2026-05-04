@@ -184,6 +184,16 @@ body {
   color: var(--text-muted);
 }
 
+.tile-file a {
+  color: var(--brand-blue);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.tile-file a:hover {
+  color: var(--brand-green);
+}
+
 .modal {
   position: fixed;
   inset: 0;
