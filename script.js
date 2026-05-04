@@ -36,7 +36,7 @@ const sectionConfig = [
         id: "event-sponsors",
         title: "Event Sponsors — 30x30 Foam Board (Easel)",
         assets: [
-          { name: "All Sponsors", file: "30x30_AllSponsor-3.jpg" },
+          { name: "All Sponsors", file: "30x30_AllSponsor.jpg" },
           {
             name: "Presenting Sponsor — High Touch Technologies, Inc.",
             file: "30x30_presenting_high-touch.jpg",
@@ -50,7 +50,6 @@ const sectionConfig = [
             name: "Beverage Cart Sponsor — IMA, Inc.",
             file: "30x30_beveragecart_IMA.jpg",
           },
-          { name: "Breakfast Sponsor — ADS, Inc.", file: "30x30_breakfast_ads.jpg" },
           { name: "Lunch Sponsor — Security 1st Title", file: "30x30_lunch_security-1st.jpg" },
           { name: "Apparel Sponsor — Under Armour", file: "30x30_apparel_under-armour.jpg" },
           {
@@ -64,13 +63,6 @@ const sectionConfig = [
         title: "Beverage Cart Sponsor — 6x4 Cling",
         assets: [
           { name: "Beverage Cart Sponsor — IMA, Inc.", file: "special_beverage-cart_ima.jpg" },
-        ],
-      },
-      {
-        id: "golf-cart-sponsor",
-        title: "Golf Cart Sponsor",
-        assets: [
-          { name: "Golf Cart Sponsor — TBD", file: "special_golf-cart_TBD.jpg" },
         ],
       },
       {
@@ -150,7 +142,8 @@ const sectionConfig = [
         id: "printed-materials",
         title: "Printed Materials (8.5x11)",
         assets: [
-          { name: "Mulligan Rules", file: "8.5x11_mulligan-rules.jpg" },
+          { name: "Golden Ball Rules", file: "8.5x11_mulligan-rules.jpg" },
+          { name: "Air Cannon Rules", file: "8.5x11_aircannonrules.jpg" },
           { name: "Check-In Signs", file: "8.5x11_check-in.jpg" },
           { name: "Printed Template", file: "8.5x11_printedtemplate.jpg" },
         ],
@@ -160,7 +153,7 @@ const sectionConfig = [
         title: "Program",
         assets: [
           { name: "Program — Front", file: "Wichita-Program-Front-Back_1.jpg" },
-          { name: "Program — Back", file: "Wichita-Program-Front-Back_2.jpg" },
+          { name: "Program — Back", file: "Wichita Program-back_2.jpg" },
         ],
       },
       {
