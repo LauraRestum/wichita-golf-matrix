@@ -231,11 +231,23 @@ const buildAssetTile = (asset) => {
   preview.tabIndex = 0;
   preview.setAttribute("aria-label", `Preview ${asset.name}`);
 
-  preview.addEventListener("click", () => openModal(asset));
+  const activate = () => {
+    if (asset.url) {
+      window.open(asset.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    openModal(asset);
+  };
+
+  if (asset.url) {
+    preview.setAttribute("aria-label", `Open ${asset.name}`);
+  }
+
+  preview.addEventListener("click", activate);
   preview.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      openModal(asset);
+      activate();
     }
   });
 
