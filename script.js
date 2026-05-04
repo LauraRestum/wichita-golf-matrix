@@ -260,16 +260,7 @@ const buildAssetTile = (asset) => {
 
   const fileLabel = document.createElement("p");
   fileLabel.className = "tile-file";
-  if (asset.url) {
-    const link = document.createElement("a");
-    link.href = asset.url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = asset.file;
-    fileLabel.append(link);
-  } else {
-    fileLabel.textContent = asset.file;
-  }
+  fileLabel.textContent = asset.file;
 
   body.append(title, fileLabel);
   card.append(preview, body);
