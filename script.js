@@ -13,6 +13,11 @@ const sectionConfig = [
             file: "vip_powerpoint.jpg",
             url: "https://canva.link/ta5z0tr0ho4ry1j",
           },
+          {
+            name: "FMS Video",
+            file: "vip_fms-video.jpg",
+            url: "https://youtu.be/7RT3yIyKRZ4",
+          },
         ],
       },
     ],
