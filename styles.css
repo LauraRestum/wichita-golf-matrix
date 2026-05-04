@@ -42,6 +42,15 @@ body {
   color: var(--brand-blue);
   font-size: 1.05rem;
   line-height: 1.35;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
 }
 
 .nav-group {
