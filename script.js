@@ -144,6 +144,13 @@ const sectionConfig = [
         ],
       },
       {
+        id: "par-is-your-friend",
+        title: "Par Is Your Friend — 24x18 Staked Sign",
+        assets: [
+          { name: "Par Is Your Friend", file: "24x18_par-is-your-friend.jpg" },
+        ],
+      },
+      {
         id: "printed-materials",
         title: "Printed Materials (8.5x11)",
         assets: [
