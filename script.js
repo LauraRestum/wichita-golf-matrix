@@ -48,10 +48,6 @@ const sectionConfig = [
           },
           { name: "19th Hole Sponsor — Farha Roofing", file: "30x30_19th-hole_farha-roofing.jpg" },
           {
-            name: "Hole-in-One Sponsor — Forvis Mazars",
-            file: "30x30_hole-in-one_ForvisMazars.jpg",
-          },
-          {
             name: "Beverage Cart Sponsor — IMA, Inc.",
             file: "30x30_beveragecart_IMA.jpg",
           },
