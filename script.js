@@ -130,24 +130,13 @@ const sectionConfig = [
           },
           { name: "Aloft Hotel Wichita", file: "24x18_teebox_aloft.jpg" },
           { name: "Pratt Industries", file: "24x18_teebox_pratt-industries.jpg" },
-          { name: "Bank of America", file: "24x18_teebox_bankofamerica.jpg" },
-        ],
-      },
-      {
-        id: "hole-sponsors-birdie",
-        title: "Birdie Sponsors — 24x18 Staked Signs",
-        assets: [
-          { name: "Delta Dental of Kansas", file: "24x18_birdie_delta-dental.jpg" },
-          { name: "ENVI Environmental", file: "24x18_birdie_envi-environmental.jpg" },
-          { name: "IdeaTek", file: "24x18_birdie_ideatek.jpg" },
-          { name: "Foulston Siefkin, LLP", file: "24x18_birdie_foulston-siefkin.jpg" },
         ],
       },
       {
         id: "par-is-your-friend",
-        title: "Par Is Your Friend — 24x18 Staked Sign",
+        title: "Par Is Your Friend — 24x18 Staked Signs (x6)",
         assets: [
-          { name: "Par Is Your Friend", file: "24x18_par-is-your-friend.jpg" },
+          { name: "Par Is Your Friend (x6)", file: "24x18_par-is-your-friend.jpg" },
         ],
       },
       {
